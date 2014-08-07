@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>avatar generator</title>
+</head>
+<body>
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
+<script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
+<script src="./pnglib.js"></script>
+<script>
+    /*
+     Reddit DailyProgrammer challenge 8/6/2014
+     Forum Avatar Generator
+     http://www.reddit.com/r/dailyprogrammer/comments/2crqml/8062014_challenge_174_intermediate_forum_avatar/
+     */
+    $(document).on('ready', function () {
+        var width = 50, height = 50, pixelWidth = 10;
+
+        $('#button').click(readInput);
+
+        function readInput() {
+            var inputs = $('#n').val().split(' ');
+            for (var i = 0; i < inputs.length; i++) {
+                generate(inputs[i]);
+            }
+        }
+
+        function generate(input) {
+
+            hash = CryptoJS.SHA1(input),
+                    png = new PNGlib(width, height, 256),
+                    bg = png.color(0, 0, 0, 0);
+
+            function insertPixel(x, y, r, g, b) {
+                png.buffer[png.index(x, y)] = png.color(r, g, b);
+            }
+
+            for (var i = 0; i < width; i += pixelWidth) {
+                var min = Math.min(width, height), temp = CryptoJS.SHA1(hash.toString().slice((min % (i + Math.floor(min / 5)))));
+                for (var j = 0; j < height; j += pixelWidth) {
+                    for (var k = 0; k < pixelWidth; k++) {
+                        for (var l = 0; l < pixelWidth; l++) {
+                            insertPixel(i + k, j + l,
+                                    parseInt('0x' + temp.toString().charAt(min % j) + temp.toString().charAt(min % j + 1)),
+                                    parseInt('0x' + temp.toString().charAt(min % j + 4) + temp.toString().charAt(min % j + 5)),
+                                    parseInt('0x' + temp.toString().charAt(min % j + 9) + temp.toString().charAt(min % j + 10))
+                            )
+                        }
+                    }
+                }
+            }
+            $('#results').append('<img src="data:image/png;base64,' + png.getBase64() + '">' + input, '<hr>');
+        }
+    });
+</script>
+    <pre>
+        <h1>avatar generator</h1>
+            input name <input type="text" id="n"><br>
+            <input type="button" value="submit" id="button">
+        <div id="results"></div>
+    </pre>
+</body>
+</html>
