@@ -19,6 +19,13 @@
 
         $('#button').click(readInput);
 
+        $('#n').keypress(function (e) {
+            if (e.keyCode === 13) {
+                readInput();
+            }
+        });
+
+
         function readInput() {
             var inputs = $('#n').val().split(' ');
             for (var i = 0; i < inputs.length; i++) {
@@ -32,12 +39,16 @@
                     png = new PNGlib(width, height, 256),
                     bg = png.color(0, 0, 0, 0);
 
+            console.log(hash.toString());
+
             function insertPixel(x, y, r, g, b) {
                 png.buffer[png.index(x, y)] = png.color(r, g, b);
             }
 
             for (var i = 0; i < width; i += pixelWidth) {
-                var min = Math.min(width, height), temp = CryptoJS.SHA1(hash.toString().slice((min % (i + Math.floor(min / 5)))));
+                var min = Math.min(width, height),
+                        temp = CryptoJS.SHA1(hash.toString().slice((min % (i + Math.floor(min / 5)))));
+                console.log(temp.toString());
                 for (var j = 0; j < height; j += pixelWidth) {
                     for (var k = 0; k < pixelWidth; k++) {
                         for (var l = 0; l < pixelWidth; l++) {
@@ -50,7 +61,7 @@
                     }
                 }
             }
-            $('#results').append('<img src="data:image/png;base64,' + png.getBase64() + '">' + input, '<hr>');
+            $('#results').append('<img src="data:image/png;base64,' + png.getBase64() + '"> ' + input, '<hr>');
         }
     });
 </script>
